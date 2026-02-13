@@ -1,0 +1,100 @@
+# ChatModerator Premium Configuration
+
+# Moderation Mode
+# Options:
+#   BLOCK  - Cancel the message entirely.
+#   CENSOR - Replace the message with the cleaned version (only works with v2 API).
+#            If v1 fallback is used in CENSOR mode, it will block or use a placeholder depending on availability.
+moderation-mode: CENSOR
+
+# Profanity API Settings
+profanity-api:
+  v2-url: "https://profanity-api.xeven.workers.dev"
+  v1-url: "https://vector.profanity.dev"
+  timeout-seconds: 5
+  
+  # Cache settings to reduce API calls
+  cache:
+    enabled: true
+    duration-minutes: 10
+
+# Score System (Premium Feature)
+# Each profane message adds its score (0.0 - 1.0) to the player's total.
+#
+# Score System
+# Scores are accumulated 0.0 - 1.0 (probability of profanity).
+# When a player reaches a score threshold, punishments are applied.
+# Scores are stored in scores.yml.
+score-system:
+  enabled: true
+  min-score-to-flag: 0.9
+  
+  # Admin Alert Format
+  # %score% displays the TOTAL ACCUMULATED SCORE of the player.
+  admin-listen:
+    type: CHAT # CHAT or ACTIONBAR
+    permission: chatmoderator.listen
+    format: "&c%player% &7score: &e%score% &8(&f%message%&8)"
+
+  # Punishment Thresholds (Accumulated Score -> Action)
+  # Format: "SCORE: COMMAND"
+  # Use underscore notation (10_0 = 10.0) to avoid YAML path parsing issues.
+  thresholds:
+    "10_0": "chatmod mute %player% 1h Auto-Mute: Too much profanity"
+    "20_0": "chatmod mute %player% 24h Auto-Mute: Persistent profanity"
+    "50_0": "chatmod ban %player% 7d Auto-Ban: Excessive profanity"
+    "100_0": "chatmod ban %player% perm Auto-Ban: Permanent"
+
+  # Score Decay
+  # Automatically reduce player scores over time to allow redemption.
+  decay:
+    enabled: true
+    # How much score to remove per interval?
+    amount: 1.0
+    # How often to apply decay? (in hours)
+    # Checks are made when player joins.
+    interval-hours: 24
+
+# Messages
+messages:
+  prefix: "&8[&bChatModerator&8] "
+  blocked: "&cYour message contains profanity and was blocked."
+  censored-notification: "&cYour message was censored."
+  
+  # Broadcasts (Visible to players with chatmoderator.admin or chatmoderator.listen)
+  mute-broadcast: "&8[&cChatModerator&8] &e%player% &7was muted by &e%punisher% &7for &e%duration%&7. Reason: &f%reason%"
+  ban-broadcast: "&8[&cChatModerator&8] &e%player% &7was banned by &e%punisher% &7for &e%duration%&7. Reason: &f%reason%"
+  
+  # Admin alert format is in score-system.admin-listen.format
+  
+  # Punishments
+  mute-reason: "&cYou are muted for %duration%. Reason: %reason%"
+  muted-error: "&cYou are muted! Expires in: %time%"
+  ban-message: "&cYou have been banned!\n&7Reason: &f%reason%\n&7Expires: &f%time%"
+  
+  # Commands
+  no-permission: "&cNo permission."
+  command-usage: "&cUsage: /chatmod <subcommand>"
+  reload-success: "&aConfiguration reloaded."
+  player-not-found: "&cPlayer not found."
+  invalid-duration: "&cInvalid duration. Use 'perm' or time like 10m, 1h, 1d etc."
+  cannot-mute-op: "&cYou cannot mute an Operator."
+  cannot-mute-bypass: "&cYou cannot mute a player with bypass permissions."
+  cannot-ban-op: "&cYou cannot ban an Operator."
+  cannot-ban-bypass: "&cYou cannot ban a player with bypass permissions."
+  mute-success: "&aMuted %player% for %duration%."
+  unmute-success: "&aUnmuted %player%."
+  ban-success: "&aBanned %player% for %duration%."
+  unban-success: "&aUnbanned %player%."
+  
+  # Listen Toggle
+  listen-enabled: "&aYou are now listening to chat moderation alerts."
+  listen-disabled: "&cYou are no longer listening to chat moderation alerts."
+  listen-only-players: "&cThis command is only for players."
+
+# Database (SQLite)
+database:
+  filename: "database.db"
+
+# Update Checker
+update-checker: true

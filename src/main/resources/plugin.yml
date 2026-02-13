@@ -1,0 +1,25 @@
+name: PremiumChatModerator
+version: '${project.version}'
+main: com.obsyrix.chatmoderator.ChatModerator
+api-version: '1.21'
+authors: [Obsyrix]
+description: A premium Chat Moderation Plugin powered by and thanks to ProfanityAPI v1 / v2
+website: www.obsyron.com
+
+commands:
+  chatmoderator:
+    description: Main command for ChatModerator
+    aliases: [chatmod]
+    usage: /chatmoderator <subcommand>
+
+permissions:
+  chatmoderator.admin:
+    description: Allows access to all admin commands
+    default: op
+  chatmoderator.bypass:
+    description: Bypasses chat moderation
+    default: false
+  chatmoderator.listen:
+    description: Receives action bar alerts for profanity
+    default: op
+
